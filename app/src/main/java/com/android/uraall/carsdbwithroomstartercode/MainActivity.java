@@ -25,11 +25,14 @@ import Model.Car;
 
 public class MainActivity extends AppCompatActivity {
 
+    //создаем адаптер
     private CarsAdapter carsAdapter;
+    //создаем списко из обьектов машин
     private ArrayList<Car> cars = new ArrayList<>();
+    //создаём вид списка
     private RecyclerView recyclerView;
-//    private DatabaseHandler dbHandler;
 
+    //создаём таблицу
     private CarsAppDataBase carsAppDataBase;
 
     @Override
@@ -38,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recyclerView);
-//        dbHandler = new DatabaseHandler(this);
 
+        //связываем таблицу
         carsAppDataBase = Room.databaseBuilder(getApplicationContext(), CarsAppDataBase.class, "carsDB")
                 .allowMainThreadQueries()
                 .build();
 
-
+        //добавляем в список из базы данных
         cars.addAll(carsAppDataBase.getCarDAO().getAllCars());
 
         carsAdapter = new CarsAdapter(this, cars, MainActivity.this);
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //метод для клика по позиции списка
     public void addAndEditCars(final boolean isUpdate, final Car car, final int position) {
         LayoutInflater layoutInflaterAndroid = LayoutInflater.from(getApplicationContext());
         View view = layoutInflaterAndroid.inflate(R.layout.layout_add_car, null);
@@ -116,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //проверяем на заполнение полей
                 if (TextUtils.isEmpty(nameEditText.getText().toString())) {
                     Toast.makeText(MainActivity.this, "Enter car name!", Toast.LENGTH_SHORT).show();
                     return;
@@ -139,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //даем возможность удалять обьект машины
     private void deleteCar(Car car, int position) {
 
         cars.remove(position);
@@ -146,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
         carsAdapter.notifyDataSetChanged();
     }
 
+    //даем возможность редактировать обьект машины
     private void updateCar(String name, String price, int position) {
 
         Car car = cars.get(position);
@@ -162,11 +168,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //создаем обьект машины с параметрами Стринг
     private void createCar(String name, String price) {
-
-        long id = carsAppDataBase.getCarDAO().addCar(
-                new Car(0, name, price));
-
+        //добавляем обьект с параметрами конструктора
+        long id = carsAppDataBase.getCarDAO().addCar(new Car(0, name, price));
 
         Car car = carsAppDataBase.getCarDAO().getCar(id);
 
